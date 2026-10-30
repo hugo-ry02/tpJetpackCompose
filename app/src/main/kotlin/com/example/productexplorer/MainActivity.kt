@@ -6,10 +6,15 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -104,6 +109,45 @@ fun ProductImage(
 }
 
 @Composable
+fun ProductPriceCard(
+    price: Double,
+    discountPercentage: Double,
+    modifier: Modifier = Modifier
+) {
+    Card(modifier = modifier) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = "$price €",
+                style = MaterialTheme.typography.headlineSmall
+            )
+            Text(
+                text = "Remise : $discountPercentage %",
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
+}
+
+@Composable
+fun ProductRating(
+    rating: Double,
+    modifier: Modifier = Modifier
+) {
+    Row(modifier = modifier) {
+        Icon(
+            imageVector = Icons.Default.Star,
+            contentDescription = "Note du produit"
+        )
+        Text(
+            text = "$rating / 5",
+            modifier = Modifier.padding(start = 8.dp)
+        )
+    }
+}
+
+@Composable
 fun ProductDetailScreen(
     product: ProductUi,
     onAddToCartClick: () -> Unit,
@@ -125,7 +169,17 @@ fun ProductDetailScreen(
             brand = product.brand,
             category = product.category
         )
-        Text(text = "${product.price} €")
+        ProductPriceCard(
+            price = product.price,
+            discountPercentage = product.discountPercentage,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp)
+        )
+        ProductRating(
+            rating = product.rating,
+            modifier = Modifier.padding(top = 16.dp)
+        )
         Text(text = product.description)
         Button(onClick = onAddToCartClick) {
             Text(text = "Ajouter au panier")

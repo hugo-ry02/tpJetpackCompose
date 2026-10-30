@@ -46,6 +46,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+// Modèle de données UI pour le produit
 data class ProductUi(
     val title: String,
     val brand: String,
@@ -59,6 +60,7 @@ data class ProductUi(
     val shippingInformation: String
 )
 
+// Exemple de produit 1 (en stock)
 fun sampleProduct(): ProductUi {
     return ProductUi(
         title = "Smartphone Toto X",
@@ -74,6 +76,24 @@ fun sampleProduct(): ProductUi {
     )
 }
 
+// Exemple de produit 2 (hors stock)
+fun sampleProductOutOfStock(): ProductUi {
+    return ProductUi(
+        title = "Casque Audio Pulse",
+        brand = "SoundPeak",
+        category = "Audio",
+        description = "Un casque confortable conçu pour écouter de la musique, " +
+                "suivre des cours en ligne et travailler dans de bonnes conditions.",
+        price = 129.99,
+        discountPercentage = 8.0,
+        rating = 4.2,
+        stock = 0,
+        warrantyInformation = "Garantie constructeur : 1 an",
+        shippingInformation = "Produit temporairement indisponible"
+    )
+}
+
+// Composant d'image produit
 @Composable
 fun ProductImage(
     productTitle: String,
@@ -86,6 +106,7 @@ fun ProductImage(
     )
 }
 
+// Composant en-tête (titre, marque, catégorie)
 @Composable
 fun ProductHeader(
     title: String,
@@ -109,6 +130,7 @@ fun ProductHeader(
     }
 }
 
+// Carte affichant le prix et la remise
 @Composable
 fun ProductPriceCard(
     price: Double,
@@ -131,6 +153,7 @@ fun ProductPriceCard(
     }
 }
 
+// Ligne affichant la note et l'icône étoile
 @Composable
 fun ProductRating(
     rating: Double,
@@ -148,6 +171,7 @@ fun ProductRating(
     }
 }
 
+// Carte pour le stock et les informations de livraison
 @Composable
 fun ProductAvailabilityCard(
     stock: Int,
@@ -174,6 +198,7 @@ fun ProductAvailabilityCard(
     }
 }
 
+// Section description
 @Composable
 fun ProductDescription(
     description: String,
@@ -192,6 +217,7 @@ fun ProductDescription(
     }
 }
 
+// Champ en lecture seule pour la garantie
 @Composable
 fun ProductWarrantyField(
     warrantyInformation: String,
@@ -208,6 +234,7 @@ fun ProductWarrantyField(
     )
 }
 
+// Bouton réutilisable d'ajout au panier
 @Composable
 fun AddToCartButton(
     onClick: () -> Unit,
@@ -221,6 +248,7 @@ fun AddToCartButton(
     }
 }
 
+// Écran principal assemblant tous les composants
 @Composable
 fun ProductDetailScreen(
     product: ProductUi,
@@ -280,12 +308,25 @@ fun ProductDetailScreen(
     }
 }
 
+// Preview 1 : Produit standard en stock
 @Preview(showBackground = true)
 @Composable
 fun ProductDetailScreenPreview() {
     ProductExplorerTheme {
         ProductDetailScreen(
             product = sampleProduct(),
+            onAddToCartClick = {}
+        )
+    }
+}
+
+// Preview 2 : Produit hors stock
+@Preview(showBackground = true)
+@Composable
+fun ProductDetailScreenOutOfStockPreview() {
+    ProductExplorerTheme {
+        ProductDetailScreen(
+            product = sampleProductOutOfStock(),
             onAddToCartClick = {}
         )
     }

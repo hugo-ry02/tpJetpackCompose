@@ -681,6 +681,18 @@ fun ProductCatalogScreen(
     }
 }
 
+// Preview du catalogue produits (TP 6)
+@Preview(showBackground = true)
+@Composable
+fun ProductCatalogScreenPreview() {
+    ProductExplorerTheme {
+        ProductCatalogScreen(
+            products = sampleProducts(),
+            onProductClick = {}
+        )
+    }
+}
+
 // Preview écran d'accueil (TP 5)
 @Preview(showBackground = true)
 @Composable

@@ -700,11 +700,28 @@ fun ProductCatalogScreen(
     }
 }
 
-// Preview du catalogue produits (TP 6)
-@Preview(showBackground = true)
+// Previews du catalogue produits en thème clair et sombre (TP 7)
+@Preview(
+    showBackground = true,
+    name = "Catalogue - Light Theme"
+)
 @Composable
-fun ProductCatalogScreenPreview() {
-    ProductExplorerTheme {
+fun ProductCatalogScreenLightPreview() {
+    ProductExplorerTheme(darkTheme = false) {
+        ProductCatalogScreen(
+            products = sampleProducts(),
+            onProductClick = {}
+        )
+    }
+}
+
+@Preview(
+    showBackground = true,
+    name = "Catalogue - Dark Theme"
+)
+@Composable
+fun ProductCatalogScreenDarkPreview() {
+    ProductExplorerTheme(darkTheme = true) {
         ProductCatalogScreen(
             products = sampleProducts(),
             onProductClick = {}

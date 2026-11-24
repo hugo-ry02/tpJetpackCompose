@@ -1,38 +1,37 @@
-# Product Explorer - TP 4, TP 5 & TP 6
+# Product Explorer - TP 4 à TP 7
 
-Application Android développée avec Jetpack Compose dans le cadre des **TP 4, TP 5 & TP 6 (Bloc 2 - Compose UI)**.
+Application Android développée avec Jetpack Compose dans le cadre du **Bloc 2 - Compose UI**.
 
 ---
 
 ## TP 4 : Écran de détail produit (`ProductDetailScreen`)
-Construire un premier écran complet de détail produit en utilisant les composants fondamentaux :
-- `Text`, `Button`, `Icon`, `Image`, `Card`, `OutlinedTextField`.
-
----
+Composants fondamentaux : `Text`, `Button`, `Icon`, `Image`, `Card`, `OutlinedTextField`.
 
 ## TP 5 : Écran d'accueil Product Explorer (`ProductHomeScreen`)
-Construire un écran d'accueil assemblant différentes sections à l'aide des principaux layouts Compose :
-- `Column`, `Row`, `Box`, `Spacer`, `Surface`.
-
----
+Layouts Compose : `Column`, `Row`, `Box`, `Spacer`, `Surface`.
 
 ## TP 6 : Affichage d'un catalogue local de produits (`ProductCatalogScreen`)
-Afficher un catalogue local complet avec les listes modernes de Compose :
-- `LazyColumn` : liste verticale performante avec `contentPadding` et `verticalArrangement = Arrangement.spacedBy(16.dp)`, combinant des éléments uniques (`item`) et une collection de produits (`items` avec `key = { it.id }`).
-- `LazyRow` : ligne horizontale scrollable de catégories (`CategoryRow`) réutilisant le composable `CategoryChip`.
-- `ProductListItem` : carte produit réutilisable (`Card`) affichant titre, marque, prix, note et bouton d'action.
-- Données locales : ajout de l'identifiant `id` sur `ProductUi`, fonction `sampleProducts()` (4 produits) et `sampleCategories()`.
+Listes modernes : `LazyColumn` (`item` + `items` avec `key`), `LazyRow` (`CategoryRow`), carte produit réutilisable (`ProductListItem`).
+
+## TP 7 : Personnalisation graphique avec Material Design 3
+Mise en place d'un thème personnalisé et cohérent pour toute l'application :
+- **Palettes de couleurs (`Theme.kt`)** : définition de `LightColorScheme` et `DarkColorScheme` (rôles `primary`, `onPrimary`, `secondary`, `background`, `onBackground`, `surface`, `onSurface`) et sélection automatique via `isSystemInDarkTheme()`.
+- **Formes personnalisées (`Theme.kt`)** : `ProductShapes` (`small`, `medium`, `large`, `extraLarge`).
+- **Typographie (`Type.kt`)** : `ProductTypography` (`headlineMedium`, `titleLarge`, `titleMedium`, `bodyMedium`, `labelLarge`).
+- **Application dans l'interface** : fond du catalogue, titre en couleur `primary`, description en `onBackground`, cartes produits avec `shapes.large`, élévation et couleurs du thème, chips catégories en `extraLarge` avec `secondary`/`onPrimary`.
+- **Previews clair & sombre** : `ProductCatalogScreenLightPreview` et `ProductCatalogScreenDarkPreview` pour vérifier les contrastes.
 
 ---
 
 ## Previews disponibles
 
-### Catalogue produits (TP 6)
-![Aperçu Catalogue Produits](screenshots/preview_catalog.png)
+### Catalogue produits - Thème clair (TP 7)
+![Aperçu Catalogue Light](screenshots/preview_catalog_light.png)
 
-### Écran d'accueil (TP 5)
-- `screenshots/preview_home.png`
+### Catalogue produits - Thème sombre (TP 7)
+![Aperçu Catalogue Dark](screenshots/preview_catalog_dark.png)
 
-### Écran de détail produit (TP 4)
-- Produit standard en stock : `screenshots/preview_product.png`
-- Produit hors stock : `screenshots/preview_outofstock.png`
+### Autres écrans (TP 4, 5 & 6)
+- Catalogue initial : `screenshots/preview_catalog.png`
+- Écran d'accueil : `screenshots/preview_home.png`
+- Détail produit : `screenshots/preview_product.png` / `screenshots/preview_outofstock.png`

@@ -585,6 +585,27 @@ fun ProductHomeScreen(
 // TP 6 - CATALOGUE LOCAL DE PRODUITS (ProductCatalogScreen)
 // =============================================================================
 
+// Liste locale des catégories
+fun sampleCategories(): List<String> {
+    return listOf("Smartphones", "Audio", "Wearables", "Maison")
+}
+
+// Ligne horizontale de catégories avec LazyRow
+@Composable
+fun CategoryRow(
+    categories: List<String>,
+    modifier: Modifier = Modifier
+) {
+    LazyRow(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(categories) { category ->
+            CategoryChip(label = category)
+        }
+    }
+}
+
 // Carte produit réutilisable pour la liste
 @Composable
 fun ProductListItem(
@@ -633,6 +654,17 @@ fun ProductCatalogScreen(
                 text = "Catalogue produits",
                 style = MaterialTheme.typography.headlineMedium
             )
+        }
+
+        item {
+            Text(
+                text = "Explorez une sélection de produits disponibles localement.",
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+
+        item {
+            CategoryRow(categories = sampleCategories())
         }
 
         items(

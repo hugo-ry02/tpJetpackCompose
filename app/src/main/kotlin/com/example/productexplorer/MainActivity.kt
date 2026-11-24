@@ -585,6 +585,38 @@ fun ProductHomeScreen(
 // TP 6 - CATALOGUE LOCAL DE PRODUITS (ProductCatalogScreen)
 // =============================================================================
 
+// Carte produit réutilisable pour la liste
+@Composable
+fun ProductListItem(
+    product: ProductUi,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(modifier = modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = product.title,
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(
+                text = product.brand,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "${product.price} € • ★ ${product.rating}",
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(onClick = onClick) {
+                Text(text = "Voir le produit")
+            }
+        }
+    }
+}
+
 @Composable
 fun ProductCatalogScreen(
     products: List<ProductUi>,
@@ -600,6 +632,18 @@ fun ProductCatalogScreen(
             Text(
                 text = "Catalogue produits",
                 style = MaterialTheme.typography.headlineMedium
+            )
+        }
+
+        items(
+            items = products,
+            key = { product -> product.id }
+        ) { product ->
+            ProductListItem(
+                product = product,
+                onClick = {
+                    onProductClick(product)
+                }
             )
         }
     }

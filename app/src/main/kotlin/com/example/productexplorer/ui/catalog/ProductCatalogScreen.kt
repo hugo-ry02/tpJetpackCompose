@@ -184,6 +184,43 @@ fun ProductListItem(
 }
 
 @Composable
+fun EmptyCatalogCard(
+    onResetFilters: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 2.dp
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp)
+        ) {
+            Text(
+                text = "Aucun produit trouvé",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(
+                text = "Essayez de modifier votre recherche ou vos filtres actifs.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.secondary
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Button(onClick = onResetFilters) {
+                Text(text = "Réinitialiser les filtres")
+            }
+        }
+    }
+}
+
+@Composable
 fun ProductCatalogContainer(
     onProductClick: (ProductUi) -> Unit,
     modifier: Modifier = Modifier,
@@ -206,6 +243,7 @@ fun ProductCatalogContainer(
         onCyclePriceSort = viewModel::onCyclePriceSort,
         favoriteProductIds = uiState.favoriteProductIds,
         onFavoriteClick = viewModel::onFavoriteClick,
+        onResetFilters = viewModel::onResetFilters,
         onProductClick = onProductClick,
         modifier = modifier
     )
@@ -227,9 +265,16 @@ fun ProductCatalogScreen(
     onCyclePriceSort: () -> Unit,
     favoriteProductIds: List<Int>,
     onFavoriteClick: (Int) -> Unit,
+    onResetFilters: () -> Unit,
     onProductClick: (ProductUi) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val hasActiveFilters = searchQuery.isNotBlank() ||
+        selectedCategory != null ||
+        showOnlyInStock ||
+        showOnlyFavorites ||
+        priceSortOrder != PriceSortOrder.NONE
+
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
@@ -277,27 +322,41 @@ fun ProductCatalogScreen(
         }
 
         item {
-            Text(
-                text = "${products.size} produit(s) affiché(s)",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onBackground
-            )
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = "${products.size} produit(s) affiché(s)",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.weight(1f)
+                )
+                if (hasActiveFilters) {
+                    OutlinedButton(onClick = onResetFilters) {
+                        Text(text = "Réinitialiser")
+                    }
+                }
+            }
         }
 
-        items(
-            items = products,
-            key = { product -> product.id }
-        ) { product ->
-            ProductListItem(
-                product = product,
-                isFavorite = favoriteProductIds.contains(product.id),
-                onFavoriteClick = {
-                    onFavoriteClick(product.id)
-                },
-                onClick = {
-                    onProductClick(product)
-                }
-            )
+        if (products.isEmpty()) {
+            item {
+                EmptyCatalogCard(onResetFilters = onResetFilters)
+            }
+        } else {
+            items(
+                items = products,
+                key = { product -> product.id }
+            ) { product ->
+                ProductListItem(
+                    product = product,
+                    isFavorite = favoriteProductIds.contains(product.id),
+                    onFavoriteClick = {
+                        onFavoriteClick(product.id)
+                    },
+                    onClick = {
+                        onProductClick(product)
+                    }
+                )
+            }
         }
     }
 }
@@ -324,6 +383,7 @@ fun ProductCatalogScreenLightPreview() {
             onCyclePriceSort = {},
             favoriteProductIds = listOf(1),
             onFavoriteClick = {},
+            onResetFilters = {},
             onProductClick = {}
         )
     }
@@ -351,6 +411,7 @@ fun ProductCatalogScreenDarkPreview() {
             onCyclePriceSort = {},
             favoriteProductIds = listOf(2),
             onFavoriteClick = {},
+            onResetFilters = {},
             onProductClick = {}
         )
     }

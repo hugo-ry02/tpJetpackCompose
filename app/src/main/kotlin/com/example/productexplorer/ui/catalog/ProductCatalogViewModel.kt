@@ -184,4 +184,17 @@ class ProductCatalogViewModel : ViewModel() {
             )
         }
     }
+
+    fun onResetFilters() {
+        _uiState.update { currentState ->
+            currentState.copy(
+                searchQuery = "",
+                selectedCategory = null,
+                showOnlyInStock = false,
+                showOnlyFavorites = false,
+                priceSortOrder = PriceSortOrder.NONE,
+                products = allProducts
+            )
+        }
+    }
 }

@@ -1,37 +1,32 @@
-# Product Explorer - TP 4 à TP 7
+# Product Explorer - TP 4 à TP 10
 
-Application Android développée avec Jetpack Compose dans le cadre du **Bloc 2 - Compose UI**.
+Application Android développée avec Jetpack Compose dans le cadre des TP du cours Android Compose.
 
 ---
 
-## TP 4 : Écran de détail produit (`ProductDetailScreen`)
-Composants fondamentaux : `Text`, `Button`, `Icon`, `Image`, `Card`, `OutlinedTextField`.
+## Bloc 2 – Compose UI (TP 4 à TP 7)
+- **TP 4 (`ProductDetailScreen`)** : composants fondamentaux (`Text`, `Button`, `Icon`, `Image`, `Card`, `OutlinedTextField`).
+- **TP 5 (`ProductHomeScreen`)** : layouts Compose (`Column`, `Row`, `Box`, `Spacer`, `Surface`).
+- **TP 6 (`ProductCatalogScreen`)** : listes modernes (`LazyColumn`, `LazyRow`, `items` avec `key`, `ProductListItem`).
+- **TP 7 (Material Design 3)** : palettes clair/sombre (`LightColorScheme`, `DarkColorScheme`), `ProductTypography` et `ProductShapes`.
 
-## TP 5 : Écran d'accueil Product Explorer (`ProductHomeScreen`)
-Layouts Compose : `Column`, `Row`, `Box`, `Spacer`, `Surface`.
+---
 
-## TP 6 : Affichage d'un catalogue local de produits (`ProductCatalogScreen`)
-Listes modernes : `LazyColumn` (`item` + `items` avec `key`), `LazyRow` (`CategoryRow`), carte produit réutilisable (`ProductListItem`).
-
-## TP 7 : Personnalisation graphique avec Material Design 3
-Mise en place d'un thème personnalisé et cohérent pour toute l'application :
-- **Palettes de couleurs (`Theme.kt`)** : définition de `LightColorScheme` et `DarkColorScheme` (rôles `primary`, `onPrimary`, `secondary`, `background`, `onBackground`, `surface`, `onSurface`) et sélection automatique via `isSystemInDarkTheme()`.
-- **Formes personnalisées (`Theme.kt`)** : `ProductShapes` (`small`, `medium`, `large`, `extraLarge`).
-- **Typographie (`Type.kt`)** : `ProductTypography` (`headlineMedium`, `titleLarge`, `titleMedium`, `bodyMedium`, `labelLarge`).
-- **Application dans l'interface** : fond du catalogue, titre en couleur `primary`, description en `onBackground`, cartes produits avec `shapes.large`, élévation et couleurs du thème, chips catégories en `extraLarge` avec `secondary`/`onPrimary`.
-- **Previews clair & sombre** : `ProductCatalogScreenLightPreview` et `ProductCatalogScreenDarkPreview` pour vérifier les contrastes.
+## Bloc 3 – State Management & Architecture UI (TP 8 à TP 10)
+- **TP 8 (États Compose)** : ajout de la recherche interactive (`OutlinedTextField`), du filtre « produits en stock », du compteur de résultats et des favoris sur `ProductListItem` (`remember`, `mutableStateOf`, `rememberSaveable`).
+- **TP 9 (State Hoisting)** : séparation entre le composable stateful `ProductCatalogContainer` (qui détient les états et la logique de filtrage) et le composable stateless `ProductCatalogScreen` (qui reçoit les valeurs et remonte les événements via callbacks).
+- **TP 10 (ViewModel)** :
+  - Ajout de `androidx.lifecycle:lifecycle-viewmodel-compose` via le Version Catalog.
+  - Création de `ProductCatalogViewModel` contenant `allProducts`, `categories`, `searchQuery`, `showOnlyInStock`, `favoriteProductIds`, `filteredProducts` et les fonctions d'action (`onSearchQueryChange`, `onToggleStockFilter`, `onFavoriteClick`).
+  - `ProductCatalogContainer` relie le `ViewModel` (`viewModel()`) à `ProductCatalogScreen`.
+  - Previews stateless dédiées (`ProductCatalogScreenLightPreview` et `ProductCatalogScreenDarkPreview`).
 
 ---
 
 ## Previews disponibles
 
-### Catalogue produits - Thème clair (TP 7)
+### Catalogue interactif - Thème clair (TP 10)
 ![Aperçu Catalogue Light](screenshots/preview_catalog_light.png)
 
-### Catalogue produits - Thème sombre (TP 7)
+### Catalogue interactif - Thème sombre (TP 10)
 ![Aperçu Catalogue Dark](screenshots/preview_catalog_dark.png)
-
-### Autres écrans (TP 4, 5 & 6)
-- Catalogue initial : `screenshots/preview_catalog.png`
-- Écran d'accueil : `screenshots/preview_home.png`
-- Détail produit : `screenshots/preview_product.png` / `screenshots/preview_outofstock.png`

@@ -9,12 +9,20 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
+enum class PriceSortOrder {
+    NONE,
+    ASCENDING,
+    DESCENDING
+}
+
 data class ProductCatalogUiState(
     val products: List<ProductUi> = emptyList(),
     val categories: List<String> = emptyList(),
     val searchQuery: String = "",
     val selectedCategory: String? = null,
     val showOnlyInStock: Boolean = false,
+    val showOnlyFavorites: Boolean = false,
+    val priceSortOrder: PriceSortOrder = PriceSortOrder.NONE,
     val favoriteProductIds: List<Int> = emptyList()
 )
 
@@ -32,12 +40,15 @@ class ProductCatalogViewModel : ViewModel() {
 
     val uiState: StateFlow<ProductCatalogUiState> = _uiState.asStateFlow()
 
-    private fun filterProducts(
+    private fun filterAndSortProducts(
         searchQuery: String,
         selectedCategory: String?,
-        showOnlyInStock: Boolean
+        showOnlyInStock: Boolean,
+        showOnlyFavorites: Boolean,
+        favoriteProductIds: List<Int>,
+        priceSortOrder: PriceSortOrder
     ): List<ProductUi> {
-        return allProducts.filter { product ->
+        val filtered = allProducts.filter { product ->
             val matchesSearch =
                 product.title.contains(searchQuery, ignoreCase = true) ||
                     product.brand.contains(searchQuery, ignoreCase = true) ||
@@ -49,7 +60,16 @@ class ProductCatalogViewModel : ViewModel() {
             val matchesStock =
                 !showOnlyInStock || product.stock > 0
 
-            matchesSearch && matchesCategory && matchesStock
+            val matchesFavorites =
+                !showOnlyFavorites || favoriteProductIds.contains(product.id)
+
+            matchesSearch && matchesCategory && matchesStock && matchesFavorites
+        }
+
+        return when (priceSortOrder) {
+            PriceSortOrder.NONE -> filtered
+            PriceSortOrder.ASCENDING -> filtered.sortedBy { it.price }
+            PriceSortOrder.DESCENDING -> filtered.sortedByDescending { it.price }
         }
     }
 
@@ -57,10 +77,13 @@ class ProductCatalogViewModel : ViewModel() {
         _uiState.update { currentState ->
             currentState.copy(
                 searchQuery = newValue,
-                products = filterProducts(
+                products = filterAndSortProducts(
                     searchQuery = newValue,
                     selectedCategory = currentState.selectedCategory,
-                    showOnlyInStock = currentState.showOnlyInStock
+                    showOnlyInStock = currentState.showOnlyInStock,
+                    showOnlyFavorites = currentState.showOnlyFavorites,
+                    favoriteProductIds = currentState.favoriteProductIds,
+                    priceSortOrder = currentState.priceSortOrder
                 )
             )
         }
@@ -72,10 +95,13 @@ class ProductCatalogViewModel : ViewModel() {
                 if (currentState.selectedCategory == category) null else category
             currentState.copy(
                 selectedCategory = newSelectedCategory,
-                products = filterProducts(
+                products = filterAndSortProducts(
                     searchQuery = currentState.searchQuery,
                     selectedCategory = newSelectedCategory,
-                    showOnlyInStock = currentState.showOnlyInStock
+                    showOnlyInStock = currentState.showOnlyInStock,
+                    showOnlyFavorites = currentState.showOnlyFavorites,
+                    favoriteProductIds = currentState.favoriteProductIds,
+                    priceSortOrder = currentState.priceSortOrder
                 )
             )
         }
@@ -86,10 +112,51 @@ class ProductCatalogViewModel : ViewModel() {
             val newShowOnlyInStock = !currentState.showOnlyInStock
             currentState.copy(
                 showOnlyInStock = newShowOnlyInStock,
-                products = filterProducts(
+                products = filterAndSortProducts(
                     searchQuery = currentState.searchQuery,
                     selectedCategory = currentState.selectedCategory,
-                    showOnlyInStock = newShowOnlyInStock
+                    showOnlyInStock = newShowOnlyInStock,
+                    showOnlyFavorites = currentState.showOnlyFavorites,
+                    favoriteProductIds = currentState.favoriteProductIds,
+                    priceSortOrder = currentState.priceSortOrder
+                )
+            )
+        }
+    }
+
+    fun onToggleFavoritesFilter() {
+        _uiState.update { currentState ->
+            val newShowOnlyFavorites = !currentState.showOnlyFavorites
+            currentState.copy(
+                showOnlyFavorites = newShowOnlyFavorites,
+                products = filterAndSortProducts(
+                    searchQuery = currentState.searchQuery,
+                    selectedCategory = currentState.selectedCategory,
+                    showOnlyInStock = currentState.showOnlyInStock,
+                    showOnlyFavorites = newShowOnlyFavorites,
+                    favoriteProductIds = currentState.favoriteProductIds,
+                    priceSortOrder = currentState.priceSortOrder
+                )
+            )
+        }
+    }
+
+    fun onCyclePriceSort() {
+        _uiState.update { currentState ->
+            val nextSort = when (currentState.priceSortOrder) {
+                PriceSortOrder.NONE -> PriceSortOrder.ASCENDING
+                PriceSortOrder.ASCENDING -> PriceSortOrder.DESCENDING
+                PriceSortOrder.DESCENDING -> PriceSortOrder.NONE
+            }
+            currentState.copy(
+                priceSortOrder = nextSort,
+                products = filterAndSortProducts(
+                    searchQuery = currentState.searchQuery,
+                    selectedCategory = currentState.selectedCategory,
+                    showOnlyInStock = currentState.showOnlyInStock,
+                    showOnlyFavorites = currentState.showOnlyFavorites,
+                    favoriteProductIds = currentState.favoriteProductIds,
+                    priceSortOrder = nextSort
                 )
             )
         }
@@ -105,7 +172,15 @@ class ProductCatalogViewModel : ViewModel() {
                 }
 
             currentState.copy(
-                favoriteProductIds = newFavoriteIds
+                favoriteProductIds = newFavoriteIds,
+                products = filterAndSortProducts(
+                    searchQuery = currentState.searchQuery,
+                    selectedCategory = currentState.selectedCategory,
+                    showOnlyInStock = currentState.showOnlyInStock,
+                    showOnlyFavorites = currentState.showOnlyFavorites,
+                    favoriteProductIds = newFavoriteIds,
+                    priceSortOrder = currentState.priceSortOrder
+                )
             )
         }
     }

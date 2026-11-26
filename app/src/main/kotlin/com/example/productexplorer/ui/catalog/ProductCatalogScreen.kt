@@ -4,11 +4,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -16,6 +18,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -53,6 +56,65 @@ fun CategoryRow(
 }
 
 @Composable
+fun CatalogFilterRow(
+    showOnlyInStock: Boolean,
+    onToggleStockFilter: () -> Unit,
+    showOnlyFavorites: Boolean,
+    favoritesCount: Int,
+    onToggleFavoritesFilter: () -> Unit,
+    priceSortOrder: PriceSortOrder,
+    onCyclePriceSort: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val sortLabel = when (priceSortOrder) {
+        PriceSortOrder.NONE -> "Prix : défaut"
+        PriceSortOrder.ASCENDING -> "Prix ↑"
+        PriceSortOrder.DESCENDING -> "Prix ↓"
+    }
+
+    LazyRow(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        item {
+            if (showOnlyInStock) {
+                Button(onClick = onToggleStockFilter) {
+                    Text(text = "En stock ✓")
+                }
+            } else {
+                OutlinedButton(onClick = onToggleStockFilter) {
+                    Text(text = "En stock")
+                }
+            }
+        }
+
+        item {
+            if (showOnlyFavorites) {
+                Button(onClick = onToggleFavoritesFilter) {
+                    Text(text = "Favoris ($favoritesCount) ✓")
+                }
+            } else {
+                OutlinedButton(onClick = onToggleFavoritesFilter) {
+                    Text(text = "Favoris ($favoritesCount)")
+                }
+            }
+        }
+
+        item {
+            if (priceSortOrder != PriceSortOrder.NONE) {
+                Button(onClick = onCyclePriceSort) {
+                    Text(text = sortLabel)
+                }
+            } else {
+                OutlinedButton(onClick = onCyclePriceSort) {
+                    Text(text = sortLabel)
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun ProductListItem(
     product: ProductUi,
     isFavorite: Boolean,
@@ -79,29 +141,43 @@ fun ProductListItem(
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
-                text = product.brand,
+                text = "${product.brand} • ${product.category}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.secondary
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "${product.price} € • ★ ${product.rating}",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Button(onClick = onFavoriteClick) {
+            Row(modifier = Modifier.fillMaxWidth()) {
                 Text(
-                    text = if (isFavorite) {
-                        "Retirer des favoris"
+                    text = "${product.price} € • ★ ${product.rating}",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    text = if (product.stock > 0) "En stock (${product.stock})" else "Rupture",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = if (product.stock > 0) {
+                        MaterialTheme.colorScheme.secondary
                     } else {
-                        "Ajouter aux favoris"
+                        MaterialTheme.colorScheme.error
                     }
                 )
             }
-            Spacer(modifier = Modifier.height(8.dp))
-            Button(onClick = onClick) {
-                Text(text = "Voir le produit")
+            Spacer(modifier = Modifier.height(12.dp))
+            Row(modifier = Modifier.fillMaxWidth()) {
+                if (isFavorite) {
+                    Button(onClick = onFavoriteClick) {
+                        Text(text = "Retirer favori")
+                    }
+                } else {
+                    OutlinedButton(onClick = onFavoriteClick) {
+                        Text(text = "Favori")
+                    }
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(onClick = onClick) {
+                    Text(text = "Voir le produit")
+                }
             }
         }
     }
@@ -124,6 +200,10 @@ fun ProductCatalogContainer(
         onCategoryClick = viewModel::onCategoryClick,
         showOnlyInStock = uiState.showOnlyInStock,
         onToggleStockFilter = viewModel::onToggleStockFilter,
+        showOnlyFavorites = uiState.showOnlyFavorites,
+        onToggleFavoritesFilter = viewModel::onToggleFavoritesFilter,
+        priceSortOrder = uiState.priceSortOrder,
+        onCyclePriceSort = viewModel::onCyclePriceSort,
         favoriteProductIds = uiState.favoriteProductIds,
         onFavoriteClick = viewModel::onFavoriteClick,
         onProductClick = onProductClick,
@@ -141,6 +221,10 @@ fun ProductCatalogScreen(
     onCategoryClick: (String) -> Unit,
     showOnlyInStock: Boolean,
     onToggleStockFilter: () -> Unit,
+    showOnlyFavorites: Boolean,
+    onToggleFavoritesFilter: () -> Unit,
+    priceSortOrder: PriceSortOrder,
+    onCyclePriceSort: () -> Unit,
     favoriteProductIds: List<Int>,
     onFavoriteClick: (Int) -> Unit,
     onProductClick: (ProductUi) -> Unit,
@@ -173,24 +257,14 @@ fun ProductCatalogScreen(
         }
 
         item {
-            Button(
-                onClick = onToggleStockFilter
-            ) {
-                Text(
-                    text = if (showOnlyInStock) {
-                        "Afficher tous les produits"
-                    } else {
-                        "Afficher uniquement les produits en stock"
-                    }
-                )
-            }
-        }
-
-        item {
-            Text(
-                text = "${products.size} produit(s) affiché(s)",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onBackground
+            CatalogFilterRow(
+                showOnlyInStock = showOnlyInStock,
+                onToggleStockFilter = onToggleStockFilter,
+                showOnlyFavorites = showOnlyFavorites,
+                favoritesCount = favoriteProductIds.size,
+                onToggleFavoritesFilter = onToggleFavoritesFilter,
+                priceSortOrder = priceSortOrder,
+                onCyclePriceSort = onCyclePriceSort
             )
         }
 
@@ -199,6 +273,14 @@ fun ProductCatalogScreen(
                 categories = categories,
                 selectedCategory = selectedCategory,
                 onCategoryClick = onCategoryClick
+            )
+        }
+
+        item {
+            Text(
+                text = "${products.size} produit(s) affiché(s)",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onBackground
             )
         }
 
@@ -236,6 +318,10 @@ fun ProductCatalogScreenLightPreview() {
             onCategoryClick = {},
             showOnlyInStock = false,
             onToggleStockFilter = {},
+            showOnlyFavorites = false,
+            onToggleFavoritesFilter = {},
+            priceSortOrder = PriceSortOrder.NONE,
+            onCyclePriceSort = {},
             favoriteProductIds = listOf(1),
             onFavoriteClick = {},
             onProductClick = {}
@@ -251,14 +337,18 @@ fun ProductCatalogScreenLightPreview() {
 fun ProductCatalogScreenDarkPreview() {
     ProductExplorerTheme(darkTheme = true) {
         ProductCatalogScreen(
-            products = sampleProducts(),
+            products = sampleProducts().filter { it.category == "Audio" }.sortedBy { it.price },
             categories = sampleCategories(),
             searchQuery = "audio",
             onSearchQueryChange = {},
             selectedCategory = "Audio",
             onCategoryClick = {},
-            showOnlyInStock = true,
+            showOnlyInStock = false,
             onToggleStockFilter = {},
+            showOnlyFavorites = false,
+            onToggleFavoritesFilter = {},
+            priceSortOrder = PriceSortOrder.ASCENDING,
+            onCyclePriceSort = {},
             favoriteProductIds = listOf(2),
             onFavoriteClick = {},
             onProductClick = {}

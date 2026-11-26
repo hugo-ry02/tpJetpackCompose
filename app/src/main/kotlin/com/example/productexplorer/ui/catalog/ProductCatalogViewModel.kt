@@ -13,6 +13,7 @@ data class ProductCatalogUiState(
     val products: List<ProductUi> = emptyList(),
     val categories: List<String> = emptyList(),
     val searchQuery: String = "",
+    val selectedCategory: String? = null,
     val showOnlyInStock: Boolean = false,
     val favoriteProductIds: List<Int> = emptyList()
 )
@@ -33,6 +34,7 @@ class ProductCatalogViewModel : ViewModel() {
 
     private fun filterProducts(
         searchQuery: String,
+        selectedCategory: String?,
         showOnlyInStock: Boolean
     ): List<ProductUi> {
         return allProducts.filter { product ->
@@ -41,10 +43,13 @@ class ProductCatalogViewModel : ViewModel() {
                     product.brand.contains(searchQuery, ignoreCase = true) ||
                     product.category.contains(searchQuery, ignoreCase = true)
 
+            val matchesCategory =
+                selectedCategory == null || product.category.equals(selectedCategory, ignoreCase = true)
+
             val matchesStock =
                 !showOnlyInStock || product.stock > 0
 
-            matchesSearch && matchesStock
+            matchesSearch && matchesCategory && matchesStock
         }
     }
 
@@ -54,6 +59,22 @@ class ProductCatalogViewModel : ViewModel() {
                 searchQuery = newValue,
                 products = filterProducts(
                     searchQuery = newValue,
+                    selectedCategory = currentState.selectedCategory,
+                    showOnlyInStock = currentState.showOnlyInStock
+                )
+            )
+        }
+    }
+
+    fun onCategoryClick(category: String) {
+        _uiState.update { currentState ->
+            val newSelectedCategory =
+                if (currentState.selectedCategory == category) null else category
+            currentState.copy(
+                selectedCategory = newSelectedCategory,
+                products = filterProducts(
+                    searchQuery = currentState.searchQuery,
+                    selectedCategory = newSelectedCategory,
                     showOnlyInStock = currentState.showOnlyInStock
                 )
             )
@@ -67,6 +88,7 @@ class ProductCatalogViewModel : ViewModel() {
                 showOnlyInStock = newShowOnlyInStock,
                 products = filterProducts(
                     searchQuery = currentState.searchQuery,
+                    selectedCategory = currentState.selectedCategory,
                     showOnlyInStock = newShowOnlyInStock
                 )
             )

@@ -34,6 +34,8 @@ import com.example.productexplorer.ui.theme.ProductExplorerTheme
 @Composable
 fun CategoryRow(
     categories: List<String>,
+    selectedCategory: String?,
+    onCategoryClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyRow(
@@ -41,7 +43,11 @@ fun CategoryRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(categories) { category ->
-            CategoryChip(label = category)
+            CategoryChip(
+                label = category,
+                isSelected = category == selectedCategory,
+                onClick = { onCategoryClick(category) }
+            )
         }
     }
 }
@@ -114,6 +120,8 @@ fun ProductCatalogContainer(
         categories = uiState.categories,
         searchQuery = uiState.searchQuery,
         onSearchQueryChange = viewModel::onSearchQueryChange,
+        selectedCategory = uiState.selectedCategory,
+        onCategoryClick = viewModel::onCategoryClick,
         showOnlyInStock = uiState.showOnlyInStock,
         onToggleStockFilter = viewModel::onToggleStockFilter,
         favoriteProductIds = uiState.favoriteProductIds,
@@ -129,6 +137,8 @@ fun ProductCatalogScreen(
     categories: List<String>,
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
+    selectedCategory: String?,
+    onCategoryClick: (String) -> Unit,
     showOnlyInStock: Boolean,
     onToggleStockFilter: () -> Unit,
     favoriteProductIds: List<Int>,
@@ -185,7 +195,11 @@ fun ProductCatalogScreen(
         }
 
         item {
-            CategoryRow(categories = categories)
+            CategoryRow(
+                categories = categories,
+                selectedCategory = selectedCategory,
+                onCategoryClick = onCategoryClick
+            )
         }
 
         items(
@@ -218,6 +232,8 @@ fun ProductCatalogScreenLightPreview() {
             categories = sampleCategories(),
             searchQuery = "",
             onSearchQueryChange = {},
+            selectedCategory = null,
+            onCategoryClick = {},
             showOnlyInStock = false,
             onToggleStockFilter = {},
             favoriteProductIds = listOf(1),
@@ -239,6 +255,8 @@ fun ProductCatalogScreenDarkPreview() {
             categories = sampleCategories(),
             searchQuery = "audio",
             onSearchQueryChange = {},
+            selectedCategory = "Audio",
+            onCategoryClick = {},
             showOnlyInStock = true,
             onToggleStockFilter = {},
             favoriteProductIds = listOf(2),
